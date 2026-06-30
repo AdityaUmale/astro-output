@@ -52,11 +52,31 @@ export default function AstrologyTesterPage() {
 
     try {
       const response = await fetch(`/api/astrology?${queryString}`);
-      const payload = await response.json();
+      const responseText = await response.text();
+      let payload: unknown;
+
+      try {
+        payload = JSON.parse(responseText);
+      } catch {
+        payload = {
+          error: response.ok
+            ? "The API returned a non-JSON response."
+            : `The API returned HTTP ${response.status}.`,
+          body: responseText
+        };
+      }
+
       const formattedPayload = JSON.stringify(payload, null, 2);
 
       if (!response.ok) {
-        setError(payload.error ?? "The calculation request failed.");
+        setError(
+          typeof payload === "object" &&
+            payload !== null &&
+            "error" in payload &&
+            typeof payload.error === "string"
+            ? payload.error
+            : "The calculation request failed."
+        );
       }
 
       setResult(formattedPayload);
