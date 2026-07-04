@@ -3,34 +3,35 @@
 import { FormEvent, useMemo, useState } from "react";
 
 type FormState = {
-  year: string;
-  month: string;
-  day: string;
-  hour: string;
+  date: string;
+  time: string;
   lat: string;
   lng: string;
+  city: string;
+  country: string;
 };
 
 const DEFAULT_FORM: FormState = {
-  year: "1990",
-  month: "1",
-  day: "1",
-  hour: "0",
+  date: "1990-01-01",
+  time: "00:00",
   lat: "28.6139",
-  lng: "77.2090"
+  lng: "77.2090",
+  city: "New Delhi",
+  country: "India"
 };
 
 const FIELDS: Array<{
   name: keyof FormState;
   label: string;
+  type?: string;
   step?: string;
 }> = [
-  { name: "year", label: "Year" },
-  { name: "month", label: "Month" },
-  { name: "day", label: "Day" },
-  { name: "hour", label: "Hour (IST)", step: "0.01" },
-  { name: "lat", label: "Latitude", step: "0.0001" },
-  { name: "lng", label: "Longitude", step: "0.0001" }
+  { name: "date", label: "Date", type: "date" },
+  { name: "time", label: "Time (IST)", type: "time" },
+  { name: "lat", label: "Latitude", type: "number", step: "0.0001" },
+  { name: "lng", label: "Longitude", type: "number", step: "0.0001" },
+  { name: "city", label: "City" },
+  { name: "country", label: "Country" }
 ];
 
 export default function AstrologyTesterPage() {
@@ -41,6 +42,7 @@ export default function AstrologyTesterPage() {
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams(form);
+    params.set("timezone", "Asia/Kolkata");
     return params.toString();
   }, [form]);
 
@@ -98,8 +100,8 @@ export default function AstrologyTesterPage() {
         <p className="eyebrow">PM testing playground</p>
         <h1>Astrology chart JSON tester</h1>
         <p>
-          Enter birth details in Indian Standard Time. The API converts the
-          time to UTC before calling Swiss Ephemeris.
+          Enter birth details in Indian Standard Time. The API builds the
+          interpreter-ready Vedic sidereal chart payload from Swiss Ephemeris.
         </p>
       </section>
 
@@ -111,7 +113,7 @@ export default function AstrologyTesterPage() {
                 <label htmlFor={field.name}>{field.label}</label>
                 <input
                   id={field.name}
-                  inputMode="decimal"
+                  inputMode={field.type === "number" ? "decimal" : "text"}
                   name={field.name}
                   onChange={(event) =>
                     setForm((currentForm) => ({
@@ -121,7 +123,7 @@ export default function AstrologyTesterPage() {
                   }
                   required
                   step={field.step ?? "1"}
-                  type="number"
+                  type={field.type ?? "text"}
                   value={form[field.name]}
                 />
               </div>
