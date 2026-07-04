@@ -27,7 +27,7 @@ const FIELDS: Array<{
   step?: string;
 }> = [
   { name: "date", label: "Date", type: "date" },
-  { name: "time", label: "Time (IST)", type: "time" },
+  { name: "time", label: "Time (IST)", type: "time", step: "60" },
   { name: "lat", label: "Latitude", type: "number", step: "0.0001" },
   { name: "lng", label: "Longitude", type: "number", step: "0.0001" },
   { name: "city", label: "City" },
@@ -122,7 +122,7 @@ export default function AstrologyTesterPage() {
                     }))
                   }
                   required
-                  step={field.step ?? "1"}
+                  step={field.step}
                   type={field.type ?? "text"}
                   value={form[field.name]}
                 />

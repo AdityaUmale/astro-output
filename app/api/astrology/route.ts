@@ -16,6 +16,7 @@ type BirthInput = {
   day: number;
   hour: number;
   minute: number;
+  second: number;
   date: string;
   time: string;
   timezone: "Asia/Kolkata";
@@ -342,7 +343,7 @@ function parseDate(value: string) {
 }
 
 function parseTime(value: string) {
-  const match = /^(\d{1,2}):(\d{2})$/.exec(value);
+  const match = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(value);
 
   if (!match) {
     throw new Error("time must use HH:mm format.");
@@ -350,12 +351,13 @@ function parseTime(value: string) {
 
   const hour = Number(match[1]);
   const minute = Number(match[2]);
+  const second = match[3] ? Number(match[3]) : 0;
 
-  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59 || second < 0 || second > 59) {
     throw new Error("time must be a valid 24-hour IST time.");
   }
 
-  return { hour, minute };
+  return { hour, minute, second };
 }
 
 function parseLegacyDecimalHour(value: number) {
@@ -366,7 +368,7 @@ function parseLegacyDecimalHour(value: number) {
   const hour = Math.floor(value);
   const minute = Math.round((value - hour) * 60);
 
-  return minute === 60 ? { hour: hour + 1, minute: 0 } : { hour, minute };
+  return minute === 60 ? { hour: hour + 1, minute: 0, second: 0 } : { hour, minute, second: 0 };
 }
 
 function parseBirthInput(searchParams: URLSearchParams): BirthInput {
@@ -459,8 +461,8 @@ function isValidCalendarDate(year: number, month: number, day: number) {
   );
 }
 
-function convertIstToUtc({ year, month, day, hour, minute }: BirthInput): UtcDateTime {
-  const localTimestamp = Date.UTC(year, month - 1, day, hour, minute, 0, 0);
+function convertIstToUtc({ year, month, day, hour, minute, second }: BirthInput): UtcDateTime {
+  const localTimestamp = Date.UTC(year, month - 1, day, hour, minute, second, 0);
   const utcDate = new Date(localTimestamp - IST_OFFSET_MS);
   const utcHour =
     utcDate.getUTCHours() +
