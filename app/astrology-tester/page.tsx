@@ -9,6 +9,7 @@ type FormState = {
   lng: string;
   city: string;
   country: string;
+  timeAccuracy: "exact" | "approximate" | "unknown";
 };
 
 const DEFAULT_FORM: FormState = {
@@ -17,7 +18,8 @@ const DEFAULT_FORM: FormState = {
   lat: "28.6139",
   lng: "77.2090",
   city: "New Delhi",
-  country: "India"
+  country: "India",
+  timeAccuracy: "exact"
 };
 
 const FIELDS: Array<{
@@ -128,6 +130,24 @@ export default function AstrologyTesterPage() {
                 />
               </div>
             ))}
+            <div className="field">
+              <label htmlFor="timeAccuracy">Time accuracy</label>
+              <select
+                id="timeAccuracy"
+                name="timeAccuracy"
+                onChange={(event) =>
+                  setForm((currentForm) => ({
+                    ...currentForm,
+                    timeAccuracy: event.target.value as FormState["timeAccuracy"]
+                  }))
+                }
+                value={form.timeAccuracy}
+              >
+                <option value="exact">Exact</option>
+                <option value="approximate">Approximate</option>
+                <option value="unknown">Unknown</option>
+              </select>
+            </div>
           </div>
 
           <p>
